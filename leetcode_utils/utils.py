@@ -82,7 +82,7 @@ class Codec:
         cursor = 1
         root = TreeNode(vals[0])
         layer = [root]
-        while layer:
+        while layer and cursor < len(vals):
             node = layer.pop(0)
             if vals[cursor] is not None:
                 node.left = TreeNode(vals[cursor])
