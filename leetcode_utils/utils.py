@@ -1,6 +1,7 @@
 """Main module."""
-from typing import AnyStr
+from collections import deque
 import json
+from typing import AnyStr
 
 
 class ListNode:
@@ -55,43 +56,44 @@ class Codec:
 
         if not root: return "[]"
 
-        last_idx, ans, Null = 0, [], [None]
-        queue = [(root, 0)]
+        ans, queue = [], deque(root)
         while queue:
-            for _ in range(len(queue)):
-                node, idx = queue.pop(0)
-                if node.left: queue.append((node.left, 2 * idx + 1))
-                if node.right: queue.append((node.right, 2 * idx + 2))
-
-                ans += Null * (idx - last_idx - 1)
+            node = queue.popleft()
+            if node:
                 ans.append(node.val)
-                last_idx = idx
+                queue.append(node.left)
+                queue.append(node.right)
+            else:
+                ans.append(None)
 
         return json.dumps(ans)
 
     @classmethod
-    def deserialize_treenode(cls, data: AnyStr) -> TreeNode:
+    def deserialize_treenode(cls, data: AnyStr) - > TreeNode:
         """Decodes your encoded data to tree.
         
         :type data: str
         :rtype: TreeNode
         """
+        assert isinstance(data, str)
+
         vals = json.loads(data)
         if not vals: return
 
         cursor = 1
         root = TreeNode(vals[0])
-        layer = [root]
-        while layer and cursor < len(vals):
-            node = layer.pop(0)
+        queue = deque(root)
+        while queue or cursor < len(vals):
+            node = queue.popleft()
+
             if vals[cursor] is not None:
                 node.left = TreeNode(vals[cursor])
-                layer.append(node.left)
+                queue.append(node.left)
             cursor += 1
 
             if vals[cursor] is not None:
                 node.right = TreeNode(vals[cursor])
-                layer.append(node.right)
+                queue.append(node.right)
             cursor += 1
 
         return root
