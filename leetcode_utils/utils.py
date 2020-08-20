@@ -1,7 +1,7 @@
 """Main module."""
-from collections import deque
+from collections import deque, defaultdict
 import json
-from typing import AnyStr
+from typing import AnyStr, Dict
 
 
 class ListNode:
@@ -15,6 +15,46 @@ class TreeNode:
         self.val = x
         self.left = None
         self.right = None
+
+
+class Trie:
+    def __init__(self):
+        # For empty string `""`
+        self.trie = {'flag': True}
+
+    def insert(self, word: str) -> None:
+        """
+        Inserts a word into the trie.
+        """
+        node = self.trie
+        for char in word:
+            if char in node:
+                node = node[char]
+            else:
+                node[char] = {}
+                node = node[char]
+        # indentify whether path is a word
+        node['flag'] = True
+
+    def search(self, word: str) -> bool:
+        """
+        Returns if the word is in the trie.
+        """
+        node = self.trie
+        for char in word:
+            if char in node: node = node[char]
+            else: return False
+        return node.get('flag', False)
+
+    def startsWith(self, prefix: str) -> bool:
+        """
+        Returns if there is any word in the trie that starts with the given prefix.
+        """
+        node = self.trie
+        for char in prefix:
+            if char in node: node = node[char]
+            else: return False
+        return True
 
 
 class Codec:
@@ -69,7 +109,7 @@ class Codec:
         return json.dumps(ans)
 
     @classmethod
-    def deserialize_treenode(cls, data: AnyStr) - > TreeNode:
+    def deserialize_treenode(cls, data: AnyStr) -> TreeNode:
         """Decodes your encoded data to tree.
         
         :type data: str
